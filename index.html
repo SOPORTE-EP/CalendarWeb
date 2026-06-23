@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Grupo Epelsa – Calendario de Vacaciones</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{
+  --bg:#f0f3f9;--surf:#fff;--bdr:#dde3ee;--navy:#0c2461;--blue:#1a56db;--blue2:#1641a0;
+  --blight:#eff6ff;--txt:#111827;--muted:#6b7280;
+  --sh:0 1px 3px rgba(0,0,0,.07),0 4px 16px rgba(0,0,0,.05);--r:10px;
+  --header-bg:linear-gradient(135deg,#0c2461,#1641a0);
+}
+body.dark{
+  --bg:#0f1117;--surf:#1a1d27;--bdr:#2e3347;--navy:#93c5fd;--blue:#3b82f6;--blue2:#60a5fa;
+  --blight:#1e2d45;--txt:#e2e8f0;--muted:#94a3b8;
+  --sh:0 1px 3px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --header-bg:linear-gradient(135deg,#0f172a,#1e293b);
+}
+/* Dark mode switch */
+.dm-switch{display:flex;align-items:center;gap:6px;cursor:pointer;padding:5px 8px;border-radius:7px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.1);transition:all .15s;user-select:none;flex-shrink:0}
+.dm-switch:hover{background:rgba(255,255,255,.22)}
+.dm-track{width:32px;height:18px;background:rgba(255,255,255,.25);border-radius:20px;position:relative;transition:background .25s;flex-shrink:0}
+body.dark .dm-track{background:#3b82f6}
+.dm-thumb{position:absolute;top:2px;left:2px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+body.dark .dm-thumb{transform:translateX(14px)}
+.dm-icon{font-size:14px;line-height:1}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh}
+header{background:var(--header-bg);height:64px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(12,36,97,.35);position:sticky;top:0;z-index:200}
+.hbrand{display:flex;align-items:center;gap:10px;color:#fff;min-width:0}
+.hlogo{height:36px;width:36px;object-fit:contain;border-radius:6px;background:transparent;padding:2px;flex-shrink:0;filter:brightness(0) invert(1)}
+.hbrand h1{font-size:14px;font-weight:700;white-space:nowrap}.hbrand p{font-size:10px;opacity:.65;margin-top:1px;white-space:nowrap}
+.hnav{display:flex;gap:5px;flex-wrap:nowrap;align-items:center}
+.nb{padding:6px 11px;border-radius:7px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;border:none;white-space:nowrap}
+.ng{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18)}.ng:hover,.ng.on{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)}
+.main{max-width:1600px;margin:0 auto;padding:22px 20px}
+#vl,#vc,#vu,#vs{display:none}#vl.on,#vc.on,#vu.on,#vs.on{display:block}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border:none;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.bb{background:var(--blue);color:#fff}.bb:hover{background:var(--blue2)}
+.bo{background:var(--surf);color:var(--txt);border:1px solid var(--bdr)}.bo:hover{border-color:var(--blue);color:var(--blue)}
+.bs{padding:5px 11px;font-size:12px}
+.brd{background:#fee2e2;color:#b91c1c;border:1px solid #fca5a5}.brd:hover{background:#b91c1c;color:#fff}
+.tc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{display:flex;flex-direction:column;gap:5px}.fg.full{grid-column:1/-1}
+.fg label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--txt);background:var(--surf);outline:none;transition:border .14s;width:100%}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.09)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:#f8fafc;border-bottom:2px solid var(--bdr)}
+th{padding:9px 12px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+tbody tr{border-bottom:1px solid #f1f5f9;transition:background .1s}
+tbody tr:hover{background:#f0f6ff}tbody tr:last-child{border-bottom:none}
+td{padding:8px 12px;vertical-align:middle}
+.color-dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex-shrink:0;border:2px solid rgba(0,0,0,.12)}
+/* CALENDAR */
+.cal-wrap{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.cal-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--bdr);gap:8px;flex-wrap:wrap}
+.cal-header h2{font-size:15px;font-weight:700;flex:1;text-align:center}
+.cal-nav{background:none;border:1px solid var(--bdr);border-radius:8px;padding:5px 11px;font-size:13px;cursor:pointer;color:var(--txt);transition:all .14s;font-family:'Inter',sans-serif}
+.cal-nav:hover{border-color:var(--blue);color:var(--blue);background:var(--blight)}
+.cal-nav.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);border-left:1px solid var(--bdr);border-top:1px solid var(--bdr)}
+.cal-dow{background:#f8fafc;padding:7px 4px;text-align:center;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr)}
+.cal-cell{min-height:88px;border-right:1px solid var(--bdr);border-bottom:1px solid var(--bdr);padding:5px;cursor:pointer;transition:background .12s;position:relative}
+.cal-cell:hover{background:#f5f8ff}
+.cal-cell.other-month{background:#f9fafb;opacity:.5}
+.cal-cell.today{background:#eff6ff}
+.cal-cell.today .cal-day{background:var(--blue);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
+.cal-day{font-size:11px;font-weight:600;color:var(--txt);margin-bottom:3px;display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px}
+.cal-event{font-size:10px;font-weight:600;padding:2px 4px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.4}
+/* Annual view */
+.annual-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:16px}
+.mini-month{border:1px solid var(--bdr);border-radius:8px;overflow:hidden;background:var(--surf)}
+.mini-month-title{background:#f8fafc;padding:7px 10px;font-size:12px;font-weight:700;color:var(--navy);border-bottom:1px solid var(--bdr);text-align:center}
+.mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0}
+.mini-dow{font-size:8px;text-align:center;padding:3px 1px;color:var(--muted);font-weight:700}
+.mini-cell{font-size:9px;text-align:center;padding:2px 1px 5px;cursor:pointer;position:relative;min-height:22px;line-height:14px}
+.mini-cell:hover{background:#e8f0ff}
+.mini-cell.other-m{opacity:.25}
+.mini-cell.today-m .mini-day-num{background:var(--blue);color:#fff;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center}
+.mini-cell.hol-nat{background:#fce7f3}
+.mini-cell.hol-reg{background:#ede9fe}
+.mini-cell.weekend{background:#f1f5f9}
+.cal-event.ev-nat{background:#fce7f3;color:#831843;border-left:3px solid #db2777}
+.cal-event.ev-reg{background:#ede9fe;color:#5b21b6;border-left:3px solid #7c3aed}
+.mini-ev-bars{position:absolute;bottom:1px;left:1px;right:1px;display:flex;gap:1px;height:3px;border-radius:2px;overflow:hidden}
+/* Info tooltip for legend */
+.legend-btn{background:none;border:1.5px solid rgba(255,255,255,.4);border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px;font-weight:700;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;font-family:'Inter',sans-serif;position:relative}
+.legend-btn:hover{background:rgba(255,255,255,.2)}
+.legend-popup{display:none;position:absolute;top:calc(100%+10px);left:0;background:#1e293b;color:#fff;border-radius:10px;padding:12px 14px;min-width:220px;box-shadow:0 8px 30px rgba(0,0,0,.3);z-index:400;font-size:12px}
+.legend-popup.open{display:block}
+.legend-popup::before{content:'';position:absolute;bottom:100%;left:14px;border:7px solid transparent;border-bottom-color:#1e293b}
+.legend-popup h4{font-size:11px;font-weight:700;margin-bottom:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
+.lp-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.lp-row:last-child{border-bottom:none}
+/* Export dropdown */
+.export-wrap{position:relative;display:inline-block}
+.export-menu{display:none;position:absolute;right:0;top:calc(100%+4px);background:#fff;border:1px solid var(--bdr);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:300;min-width:200px;overflow:hidden}
+.export-menu.open{display:block}
+.export-item{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13px;cursor:pointer;transition:background .12s;color:var(--txt);border:none;background:none;width:100%;text-align:left;font-family:'Inter',sans-serif}
+.export-item:hover{background:#f0f6ff;color:var(--blue)}
+.export-item .ext{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-left:auto;background:#f1f5f9;padding:1px 5px;border-radius:4px}
+/* Overlays */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.mbox{background:#fff;border-radius:14px;padding:26px 28px;max-width:520px;width:94%;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto;position:relative;z-index:501}
+.mbox h3{font-size:16px;font-weight:600;margin-bottom:6px}
+.mbtns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;flex-wrap:wrap}
+.mcancel{padding:8px 18px;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer}
+.mconfirm{padding:8px 18px;background:#b91c1c;color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer;font-weight:600}
+.mconfirm.blue{background:var(--blue)}.mconfirm.blue:hover{background:var(--blue2)}
+.mconfirm.green{background:#16a34a}.mconfirm.green:hover{background:#15803d}
+/* PIN */
+.pin-input{font-size:22px;letter-spacing:6px;font-family:'JetBrains Mono',monospace;text-align:center;width:160px;padding:10px;border:2px solid var(--bdr);border-radius:10px;outline:none}
+.pin-input:focus{border-color:var(--blue)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .4s}
+.pin-err{color:#b91c1c;font-size:12px;margin-top:6px;min-height:16px}
+.change-pin{font-size:11px;color:var(--blue);cursor:pointer;text-decoration:underline;margin-top:8px;display:block;text-align:center}
+/* Color picker */
+.color-pick{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.color-opt{width:26px;height:26px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all .15s}
+.color-opt.sel,.color-opt:hover{border-color:#333;transform:scale(1.15)}
+/* Supabase dot */
+.sb-dot{width:8px;height:8px;border-radius:50%;transition:background .3s;display:inline-block}
+.sb-dot.ok{background:#4ade80}.sb-dot.err{background:#f87171}.sb-dot.sync{background:#fbbf24;animation:sbpulse 1s infinite}.sb-dot.off{background:#6b7280}
+@keyframes sbpulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* Supabase setup */
+.sb-setup{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;align-items:center;justify-content:center}
+.sb-setup.open{display:flex}
+.sb-box{background:#fff;border-radius:14px;padding:28px;max-width:460px;width:94%;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.sb-box h3{font-size:17px;font-weight:700;margin-bottom:6px}
+.sb-field{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.sb-field label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px}
+.sb-field input{padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none}
+.sb-field input:focus{border-color:#3ecf8e}
+.sb-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
+.sb-cancel{padding:8px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;cursor:pointer}
+.sb-save{padding:8px 18px;background:#3ecf8e;color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer}
+.sb-msg{font-size:12px;min-height:18px;margin-top:8px}
+.sb-steps{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:12px;line-height:1.8;color:#166534}
+.edit-mode-banner{display:none;background:#fef3c7;border:1px solid #fcd34d;border-radius:var(--r);padding:10px 16px;margin-bottom:14px;align-items:center;gap:12px}
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9000;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toast-item{background:#1e293b;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:fadeInUp .3s ease}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Day detail */
+.day-popup{background:#fff;border-radius:12px;padding:20px;max-width:440px;width:92%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.day-popup h3{font-size:15px;font-weight:700;margin-bottom:12px}
+.ev-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;background:#f8fafc;border:1px solid var(--bdr);margin-bottom:6px;font-size:12px}
+/* Solicitudes */
+.sol-card{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:14px}
+.sol-card-head{padding:12px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sol-card-body{padding:14px 16px}
+.sol-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--bdr);margin-bottom:6px;background:#f8fafc;flex-wrap:wrap}
+.sol-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.sol-vac{background:#dbeafe;color:#1e3a8a}
+.sol-asunto{background:#fef3c7;color:#92400e}
+.sol-medica{background:#f0fdf4;color:#166534}
+/* Pills */
+.entitle-pill{background:var(--surf);border:1px solid var(--bdr);border-radius:30px;padding:4px 11px;font-size:12px;font-weight:600;color:var(--txt);display:inline-flex;align-items:center;gap:5px}
+.ep-ok{color:#16a34a}.ep-warn{color:#d97706}
+.ep-err{color:#b91c1c;font-weight:800}
+.ep-full{color:#b91c1c;font-weight:800}
+/* Hour chips */
+.hour-selector{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.hour-chip{padding:4px 10px;border-radius:20px;border:1.5px solid var(--bdr);font-size:12px;font-weight:600;cursor:pointer;transition:all .14s;user-select:none;background:#f8fafc}
+.hour-chip.sel{background:var(--blue);color:#fff;border-color:var(--blue)}
+.hour-chip:hover:not(.sel):not(.disabled){border-color:var(--blue);color:var(--blue)}
+.hour-chip.disabled{opacity:.35;cursor:not-allowed;background:#f1f5f9}
+/* ══ DARK MODE OVERRIDES ══ */
+body.dark .tc,body.dark .sol-card,body.dark .cal-wrap,body.dark .mini-month{background:var(--surf);border-color:var(--bdr)}
+body.dark .cal-dow,body.dark .mini-month-title{background:#22273a;color:var(--muted)}
+body.dark thead tr{background:#22273a}
+body.dark .cal-cell,body.dark .mini-cell{color:var(--txt)}
+body.dark .cal-cell:hover{background:#1e2d45}
+body.dark .mini-cell:hover{background:#1e2d45}
+body.dark .cal-cell.other-month{background:#141720;opacity:.5}
+body.dark .mini-cell.other-m{opacity:.25}
+body.dark .cal-cell.today{background:#1e3a5f}
+body.dark .cal-cell[style*="f9fafb"]{background:#141720 !important}
+body.dark .cal-cell[style*="fff0f6"]{background:#3b0a1e !important}
+body.dark .cal-cell[style*="f5f3ff"]{background:#1e1040 !important}
+body.dark .mini-cell.hol-nat{background:#3b0a1e}
+body.dark .mini-cell.hol-reg{background:#1e1040}
+body.dark .mini-cell.weekend{background:#141720}
+body.dark .mbox,body.dark .day-popup{background:#1a1d27;color:var(--txt)}
+body.dark .mcancel{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark .fg input,body.dark .fg select,body.dark .fg textarea,body.dark input[type=date],body.dark input[type=text],body.dark input[type=email],body.dark input[type=number],body.dark input[type=password]{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark select{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark .cal-nav{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark .cal-nav:hover{background:#1e2d45;border-color:var(--blue);color:var(--blue)}
+body.dark .bo{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark .bo:hover{border-color:var(--blue);color:var(--blue)}
+body.dark .hour-chip{background:#22273a;border-color:var(--bdr);color:var(--txt)}
+body.dark .sol-row{background:#22273a;border-color:var(--bdr)}
+body.dark .ev-item{background:#22273a;border-color:var(--bdr)}
+body.dark .entitle-pill{background:#22273a;border-color:var(--bdr)}
+body.dark tbody tr:hover{background:#1e2d45}
+body.dark tbody tr{border-color:#2e3347}
+body.dark .edit-mode-banner{background:#2d2007;border-color:#78350f;color:#fcd34d}
+body.dark .legend-popup{background:#0f172a}
+body.dark .export-menu{background:#1a1d27;border-color:var(--bdr)}
+body.dark .export-item{color:var(--txt)}
+body.dark .export-item:hover{background:#1e2d45;color:var(--blue)}
+@media(max-width:900px){.annual-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.annual-grid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.cal-event{display:none}.cal-cell{min-height:44px}}
+</style>
+</head>
+<body>
+
+<header id="main-header">
+  <div class="hbrand">
+    <span class="sb-dot off" id="sb-dot" title="Sincronización base de datos" style="width:10px;height:10px;flex-shrink:0;display:inline-block"></span>
+    <img src="data:image/png;base64,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" class="hlogo" alt="Epelsa">
+    <div>
+      <h1>GRUPO EPELSA</h1>
+      <p>Gestión de calendario laboral</p>
+    </div>
+  </div>
+  <div class="hnav">
+    <button class="nb ng" id="btnE" onclick="reqAuth(enterEditMode)" title="Modo edición (PIN)" style="padding:6px 9px">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    </button>
+    <button class="nb ng" id="btnCal" onclick="sv('c')">📅 Calendario</button>
+    <button class="nb ng on" id="btnSol" onclick="sv('s')">📝 Solicitudes</button>
+    <button class="nb ng" id="btnList" onclick="sv('l')">📋 Resumen</button>
+    <button class="nb ng" id="btnUsers" onclick="sv('u')">👥 Usuarios</button>
+    <button class="nb ng" id="btn-logout" style="display:none" onclick="handleSalir()">⎋ Salir</button>
+    <div class="dm-switch" onclick="toggleDarkMode()" title="Modo oscuro / claro">
+      <span class="dm-icon" id="dm-icon">☀️</span>
+      <div class="dm-track"><div class="dm-thumb"></div></div>
+    </div>
+  </div>
+</header>
+
+<!-- MODO EDITAR -->
+<div class="main" style="padding-bottom:0;padding-top:12px">
+  <div class="edit-mode-banner" id="edit-mode-banner">
+    <span style="font-size:20px">✏️</span>
+    <div style="flex:1"><div style="font-weight:600;font-size:13px;color:#92400e">Modo edición activo</div><div style="font-size:11px;color:#78350f">Puedes añadir, modificar y eliminar solicitudes y usuarios.</div></div>
+    <button class="btn bs" onclick="exitEditMode()" style="background:#92400e;color:#fff">✕ Salir</button>
+  </div>
+</div>
+
+<!-- ══ VISTA: SOLICITUDES ══ -->
+<div class="main" id="vs">
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;font-size:18px;font-weight:700;color:var(--navy)">📝 Solicitudes de Usuarios</div>
+    <select id="sol-dept" onchange="renderSolicitudes()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none"></select>
+    <select id="sol-year" onchange="renderSolicitudes()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none"></select>
+    <button class="btn bb" onclick="openAddEvent()">➕ Nueva solicitud</button>
+  </div>
+  <div id="sol-wrap"></div>
+</div>
+
+<!-- ══ VISTA: CALENDARIO ══ -->
+<div class="main" id="vc">
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <!-- Title with legend icon -->
+    <div style="display:flex;align-items:center;gap:8px;flex:1">
+      <div style="position:relative;display:inline-flex">
+        <button style="background:none;border:none;font-size:22px;cursor:pointer;line-height:1;padding:0" id="legend-cal-btn" onclick="toggleLegend(event)" title="Tipos de leyenda">📅</button>
+        <div class="legend-popup" id="legend-popup" style="bottom:auto;top:calc(100%+8px);left:0;transform:none">
+          <div class="legend-popup-arrow-up"></div>
+          <h4>Tipos de leyenda</h4>
+          <div class="lp-row"><span style="font-size:16px">🏖️</span><span>Vacaciones</span></div>
+          <div class="lp-row"><span style="font-size:16px">🕐</span><span>Asuntos propios</span></div>
+          <div class="lp-row"><span style="font-size:16px">🩺</span><span>Cita médica</span></div>
+          <div class="lp-row"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#db2777;flex-shrink:0"></span><span>Festivo nacional</span></div>
+          <div class="lp-row"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:#7c3aed;flex-shrink:0"></span><span>Festivo CAM (Madrid)</span></div>
+          <div id="legend-user-rows" style="margin-top:4px"></div>
+        </div>
+      </div>
+      <span style="font-size:18px;font-weight:700;color:var(--navy)">Calendario de Vacaciones</span>
+    </div>
+    <div class="export-wrap" id="cal-holiday-btn-wrap" style="display:none">
+      <button class="btn bb" onclick="openAddHoliday()">📌 Añadir festivo</button>
+    </div>
+    <select id="cal-dept-filter" onchange="onCalDeptChange()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none">
+      <option value="">Todos los departamentos</option>
+    </select>
+    <select id="cal-user-filter" onchange="renderCalendar()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none">
+      <option value="">Todos los usuarios</option>
+    </select>
+  </div>
+  <div class="cal-wrap">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="changeMonth(-1)">‹ Anterior</button>
+      <h2 id="cal-title" style="flex:1;text-align:center"></h2>
+      <div style="display:flex;gap:6px;align-items:center">
+        <select id="cal-view-sel" onchange="onCalViewChange()" style="padding:5px 9px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:12px;outline:none;cursor:pointer">
+          <option value="monthly">Vista mensual</option>
+          <option value="annual">Vista anual</option>
+          <option value="daily">Vista diaria</option>
+        </select>
+        <button class="cal-nav" onclick="goToday()">Hoy</button>
+        <button class="cal-nav" onclick="changeMonth(1)">Siguiente ›</button>
+      </div>
+    </div>
+    <div id="cal-body"></div>
+  </div>
+</div>
+
+<!-- ══ VISTA: RESUMEN ══ -->
+<div class="main" id="vl">
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;font-size:18px;font-weight:700;color:var(--navy)">📋 Resumen de Solicitudes</div>
+    <select id="summary-dept" onchange="renderSummary()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none"></select>
+    <select id="summary-year" onchange="renderSummary()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none"></select>
+    <div class="export-wrap">
+      <button class="btn bo" onclick="toggleExportMenu2(event)">⬇ Exportar <span style="font-size:11px">▾</span></button>
+      <div class="export-menu" id="export-menu2">
+        <button class="export-item" onclick="exportCSV();closeExportMenu2()">📄 CSV <span class="ext">CSV</span></button>
+        <button class="export-item" onclick="exportXLS();closeExportMenu2()">📊 Excel <span class="ext">XLSX</span></button>
+        <button class="export-item" onclick="exportPDF();closeExportMenu2()">📑 PDF <span class="ext">PDF</span></button>
+      </div>
+    </div>
+  </div>
+  <div id="summary-wrap"></div>
+</div>
+
+<!-- ══ VISTA: USUARIOS ══ -->
+<div class="main" id="vu">
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+    <div style="flex:1;font-size:18px;font-weight:700;color:var(--navy)">👥 Gestión de Usuarios</div>
+    <select id="users-dept" onchange="renderUsers()" style="padding:7px 12px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none"></select>
+    <button class="btn bb" id="add-user-btn" style="display:none" onclick="openAddUser()">➕ Nuevo usuario</button>
+  </div>
+  <div class="tc">
+    <table>
+      <thead><tr>
+        <th style="width:36px"></th>
+        <th>Nombre</th><th>Departamento</th><th>Email</th>
+        <th>Vacaciones (días)</th><th>Asuntos propios (h)</th><th>Cita médica (h)</th><th>Año</th>
+        <th id="user-actions-th" style="display:none">Acciones</th>
+      </tr></thead>
+      <tbody id="users-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: PIN ══ -->
+<div class="overlay" id="pin-overlay">
+  <div class="mbox" style="text-align:center;max-width:360px">
+    <h3>PIN de administrador</h3>
+    <p style="color:var(--muted);font-size:13px;margin:6px 0 16px">Introduce el PIN para acceder al modo edición</p>
+    <input class="pin-input" id="pin-input" type="password" maxlength="8" placeholder="••••" oninput="if(this.value.length>=4)submitPin()">
+    <div class="pin-err" id="pin-err"></div>
+    <span class="change-pin" onclick="showChangePin()">Cambiar PIN</span>
+    <div class="mbtns" style="justify-content:center"><button class="mcancel" onclick="closeOverlay('pin-overlay')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: CAMBIAR PIN ══ -->
+<div class="overlay" id="chpin-overlay">
+  <div class="mbox" style="max-width:360px">
+    <h3>🔐 Cambiar PIN</h3>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+      <div class="fg"><label>PIN actual</label><input class="pin-input" id="chpin-old" type="password" maxlength="8" placeholder="••••" style="font-size:18px"></div>
+      <div class="fg"><label>Nuevo PIN</label><input class="pin-input" id="chpin-new" type="password" maxlength="8" placeholder="••••" style="font-size:18px"></div>
+      <div class="fg"><label>Repetir nuevo PIN</label><input class="pin-input" id="chpin-rep" type="password" maxlength="8" placeholder="••••" style="font-size:18px"></div>
+    </div>
+    <div class="pin-err" id="chpin-err"></div>
+    <div class="mbtns"><button class="mcancel" onclick="closeOverlay('chpin-overlay')">Cancelar</button><button class="mconfirm blue" onclick="submitChangePIN()">Guardar PIN</button></div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: SOLICITUD ══ -->
+<div class="overlay" id="event-overlay">
+  <div class="mbox">
+    <h3 id="event-overlay-title">➕ Nueva solicitud</h3>
+    <input type="hidden" id="ev-id">
+    <div style="display:flex;flex-direction:column;gap:13px;margin-top:14px">
+      <div class="fg">
+        <label>Usuario</label>
+        <select id="ev-user" onchange="refreshHourChips()"></select>
+      </div>
+      <div class="fg">
+        <label>Tipo de solicitud</label>
+        <select id="ev-type" onchange="onEvTypeChange()">
+          <option value="vacaciones">🏖️ Vacaciones</option>
+          <option value="asunto">🕐 Asuntos propios</option>
+          <option value="medica">🩺 Cita médica</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Fecha inicio</label>
+        <input type="date" id="ev-start">
+      </div>
+      <div class="fg" id="ev-end-wrap">
+        <label>Fecha fin</label>
+        <input type="date" id="ev-end">
+      </div>
+      <div class="fg" id="ev-hours-wrap" style="display:none">
+        <label>Horas del día</label>
+        <div class="hour-selector" id="hour-chips"></div>
+        <div style="margin-top:7px;font-size:11px" id="ev-hours-info"></div>
+      </div>
+      <div class="fg">
+        <label>Notas (opcional)</label>
+        <textarea id="ev-notes" rows="2" placeholder="Observaciones…" style="resize:vertical"></textarea>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeOverlay('event-overlay')">Cancelar</button>
+      <button class="mconfirm" id="ev-del-btn" style="display:none" onclick="deleteCurrentEvent()">🗑️ Eliminar</button>
+      <button class="mconfirm green" onclick="saveEvent()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: USUARIO ══ -->
+<div class="overlay" id="user-overlay">
+  <div class="mbox">
+    <h3 id="user-overlay-title">➕ Nuevo usuario</h3>
+    <input type="hidden" id="usr-id">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">
+      <div class="fgrid">
+        <div class="fg"><label>Nombre</label><input id="usr-name" placeholder="Nombre completo"></div>
+        <div class="fg"><label>Departamento</label>
+          <select id="usr-dept">
+            <option>SAT</option><option>Soporte</option><option>Exportación</option><option>Expediciones</option>
+            <option>Comercial</option><option>Taller</option><option>Mantenimiento</option>
+            <option>Producción</option><option>Ingeniería</option><option>Desarrollo</option><option>Administración</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Email</label><input id="usr-email" type="email" placeholder="correo@grupoepelsa.com"></div>
+      </div>
+      <div style="background:#f0f6ff;border:1px solid #bfdbfe;border-radius:9px;padding:14px">
+        <div style="font-size:11px;font-weight:700;color:#1e3a8a;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">⚙️ Derechos anuales (solo admin)</div>
+        <div class="fgrid" style="gap:10px">
+          <div class="fg"><label>🏖️ Días de vacaciones</label><input id="usr-vac" type="number" min="0" max="60" value="22"></div>
+          <div class="fg"><label>🕐 Horas asuntos propios</label><input id="usr-asunto" type="number" min="0" max="500" step="0.5" value="22.5"></div>
+          <div class="fg"><label>🩺 Horas cita médica</label><input id="usr-medica" type="number" min="0" max="100" value="16"></div>
+          <div class="fg"><label>Año en vigor</label><input id="usr-year" type="number" min="2020" max="2035"></div>
+        </div>
+      </div>
+      <div class="fg">
+        <label>Color identificativo</label>
+        <div class="color-pick" id="color-pick-wrap"></div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px">
+          <label style="font-size:11px;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500">Color personalizado:</label>
+          <input type="color" id="usr-custom-color" value="#3b82f6" oninput="selectColor(this.value)" style="width:36px;height:28px;padding:1px;border:1px solid var(--bdr);border-radius:6px;cursor:pointer">
+        </div>
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeOverlay('user-overlay')">Cancelar</button>
+      <button class="mconfirm" id="usr-del-btn" style="display:none" onclick="deleteCurrentUser()">🗑️ Eliminar</button>
+      <button class="mconfirm green" onclick="saveUser()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: DÍA ══ -->
+<div class="overlay" id="day-overlay">
+  <div class="day-popup">
+    <h3 id="day-popup-title"></h3>
+    <div id="day-popup-content"></div>
+    <div class="mbtns" style="margin-top:12px">
+      <button class="mcancel" onclick="closeOverlay('day-overlay')">Cerrar</button>
+      <button class="mconfirm blue" id="day-add-btn" style="display:none" onclick="openAddEventForDate()">➕ Añadir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY: CONFIRMAR ELIMINACIÓN ══ -->
+<div class="overlay" id="del-overlay">
+  <div class="mbox" style="max-width:380px">
+    <h3>⚠️ Confirmar eliminación</h3>
+    <p id="del-desc" style="color:var(--muted);font-size:13px;margin:8px 0"></p>
+    <div class="mbtns"><button class="mcancel" onclick="closeOverlay('del-overlay')">Cancelar</button><button class="mconfirm" id="del-confirm-btn">Eliminar</button></div>
+  </div>
+</div>
+
+<!-- INTEGRACION DE Supabase -->
+
+<!-- ══ OVERLAY: FESTIVO MANUAL ══ -->
+<div class="overlay" id="holiday-overlay">
+  <div class="mbox" style="max-width:440px">
+    <h3 id="hol-overlay-title">📌 Añadir festivo</h3>
+    <input type="hidden" id="hol-id">
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:14px">
+      <div class="fg">
+        <label>Tipo de festivo</label>
+        <select id="hol-type" style="padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none">
+          <option value="nacional">🇪🇸 Festivo nacional</option>
+          <option value="madrid">🏛️ Festivo Comunidad de Madrid</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Fecha</label>
+        <input type="date" id="hol-date" style="padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none">
+      </div>
+      <div class="fg">
+        <label>Nombre del festivo</label>
+        <input type="text" id="hol-name" placeholder="Ej: Día del Trabajador" style="padding:8px 11px;border:1px solid var(--bdr);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;outline:none">
+      </div>
+    </div>
+    <div class="mbtns">
+      <button class="mcancel" onclick="closeOverlay('holiday-overlay')">Cancelar</button>
+      <button class="mconfirm" id="hol-del-btn" style="display:none;background:#b91c1c" onclick="deleteCurrentHoliday()">🗑️ Eliminar</button>
+      <button class="mconfirm green" onclick="saveHoliday()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+// ══════ CONFIG ══════
+const LS_USERS='epelsa_cal_users', LS_EVENTS='epelsa_cal_events', PIN_KEY='epelsa_cal_pin', LS_HOLIDAYS='epelsa_cal_holidays', _SB_CFG_K='epelsa_cal_sbcfg';
+const _SB_STATIC_URL='https://mkymomjhajolwcgepigb.supabase.co';
+const _SB_STATIC_KEY='sb_publishable_asLy5hErnLN08AV33tsSHA_aMqDnksz';
+const USER_COLORS=['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#f97316','#ec4899','#84cc16','#6366f1','#14b8a6','#e11d48','#a855f7','#0ea5e9','#22c55e'];
+const MONTH_NAMES=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DOW_NAMES=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const HOUR_CHIPS=[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7,7.5,8];
+
+// Festivos nacionales Espana (fijos o calculo por anio)
+function getSpainHolidays(year){
+  // Easter Sunday calculation (Butcher's algorithm)
+  const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4;
+  const f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30;
+  const i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7;
+  const m=Math.floor((a+11*h+22*l)/451);
+  const month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  const easter=new Date(year,month-1,day);
+  // Good Friday = Easter - 2
+  const gf=new Date(easter); gf.setDate(gf.getDate()-2);
+  const fmtD=d=>d.toISOString().split('T')[0];
+
+  const nacional=[
+    `${year}-01-01`, // Año Nuevo
+    `${year}-01-06`, // Reyes
+    fmtD(gf),        // Viernes Santo
+    `${year}-05-01`, // Trabajo
+    `${year}-08-15`, // Asunción
+    `${year}-10-12`, // Hispanidad
+    `${year}-11-01`, // Todos los Santos
+    `${year}-12-06`, // Constitución
+    `${year}-12-08`, // Inmaculada
+    `${year}-12-25`, // Navidad
+  ];
+
+  const madrid=[
+    `${year}-03-19`, // San José (CAM tradicional - sustituido en algunos años)
+    `${year}-05-02`, // Comunidad de Madrid
+    `${year}-07-25`, // Santiago Apóstol
+    `${year}-11-09`, // Almudena (Madrid ciudad - sustituye a Santiago en algunos años)
+  ];
+
+  // Adjust for weekend substitutions (if falls Sat/Sun → Mon)
+  function adjust(dates){
+    return dates.map(d=>{
+      let dt=new Date(d+'T12:00:00');
+      const dow=dt.getDay();
+      if(dow===0)dt.setDate(dt.getDate()+1); // Sunday > Monday
+      else if(dow===6)dt.setDate(dt.getDate()+2); // Saturday > Monday
+      return fmtD(dt);
+    });
+  }
+
+  return {nacional:adjust(nacional), madrid:adjust(madrid)};
+}
+
+function isHoliday(dateStr){
+  const y=parseInt(dateStr.substring(0,4));
+  const h=getHolidaysForYear(String(y));
+  if(h.nacional.includes(dateStr)) return 'nacional';
+  if(h.madrid.includes(dateStr)) return 'madrid';
+  return null;
+}
+
+function isWeekend(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  return d.getDay()===0||d.getDay()===6;
+}
+
+// Count working vacation days (exclude weekends and holidays)
+function countWorkingDays(start,end){
+  let count=0;
+  let d=new Date(start+'T12:00:00');
+  const e=new Date(end+'T12:00:00');
+  while(d<=e){
+    const ds=d.toISOString().split('T')[0];
+    if(!isWeekend(ds)&&!isHoliday(ds)) count++;
+    d.setDate(d.getDate()+1);
+  }
+  return count;
+}
+
+// ══════ STORAGE ══════
+function getUsers(){try{return JSON.parse(localStorage.getItem(LS_USERS)||'[]');}catch{return[];}}
+function saveUsers(d){localStorage.setItem(LS_USERS,JSON.stringify(d));sbSync();}
+function getEvents(){try{return JSON.parse(localStorage.getItem(LS_EVENTS)||'[]');}catch{return[];}}
+function saveEvents(d){localStorage.setItem(LS_EVENTS,JSON.stringify(d));sbSync();}
+function getManualHolidays(){try{return JSON.parse(localStorage.getItem(LS_HOLIDAYS)||'[]');}catch{return[];}}
+function saveManualHolidays(d){localStorage.setItem(LS_HOLIDAYS,JSON.stringify(d));sbSync();}
+
+// Merge auto-calculated + manual holidays for a year
+function getHolidaysForYear(year){
+  const auto=getSpainHolidays(year);
+  const manual=getManualHolidays().filter(h=>h.date&&h.date.startsWith(year));
+  const manNac=manual.filter(h=>h.type==='nacional').map(h=>h.date);
+  const manMad=manual.filter(h=>h.type==='madrid').map(h=>h.date);
+  return {
+    nacional:[...auto.nacional,...manNac],
+    madrid:[...auto.madrid,...manMad],
+    manual
+  };
+}
+
+// Get holiday name for a date (manual overrides auto)
+function getHolidayName(dateStr){
+  const manual=getManualHolidays().find(h=>h.date===dateStr);
+  if(manual) return manual.name||'Festivo';
+  const y=parseInt(dateStr.substring(0,4));
+  const hols=getSpainHolidays(y);
+  if(hols.nacional.includes(dateStr)) return 'Festivo nacional';
+  if(hols.madrid.includes(dateStr)) return 'Festivo CAM';
+  return null;
+}
+
+// Manual holiday CRUD
+let _editHolId=null;
+function openAddHoliday(prefillDate){
+  _editHolId=null;
+  document.getElementById('hol-overlay-title').textContent='📌 Añadir festivo';
+  document.getElementById('hol-del-btn').style.display='none';
+  document.getElementById('hol-id').value='';
+  document.getElementById('hol-type').value='nacional';
+  document.getElementById('hol-date').value=prefillDate||today();
+  document.getElementById('hol-name').value='';
+  document.getElementById('holiday-overlay').classList.add('open');
+}
+function editHoliday(id){
+  const h=getManualHolidays().find(x=>x.id===id);if(!h)return;
+  _editHolId=id;
+  document.getElementById('hol-overlay-title').textContent='✏️ Editar festivo';
+  document.getElementById('hol-del-btn').style.display='inline-flex';
+  document.getElementById('hol-id').value=id;
+  document.getElementById('hol-type').value=h.type||'nacional';
+  document.getElementById('hol-date').value=h.date||'';
+  document.getElementById('hol-name').value=h.name||'';
+  document.getElementById('holiday-overlay').classList.add('open');
+}
+function saveHoliday(){
+  const type=document.getElementById('hol-type').value;
+  const date=document.getElementById('hol-date').value;
+  const name=document.getElementById('hol-name').value.trim();
+  if(!date){showToast('Selecciona una fecha','err');return;}
+  if(!name){showToast('Introduce un nombre para el festivo','err');return;}
+  const all=getManualHolidays();
+  if(_editHolId){
+    const idx=all.findIndex(h=>h.id===_editHolId);
+    if(idx>=0)all[idx]={...all[idx],type,date,name};
+  } else {
+    all.push({id:uid(),type,date,name});
+  }
+  saveManualHolidays(all);
+  closeOverlay('holiday-overlay');
+  showToast('Festivo guardado ✓');
+  renderCalendar();
+}
+function deleteCurrentHoliday(){
+  const id=_editHolId;
+  closeOverlay('holiday-overlay');
+  document.getElementById('del-desc').textContent='¿Eliminar este festivo manual?';
+  document.getElementById('del-confirm-btn').onclick=()=>{
+    saveManualHolidays(getManualHolidays().filter(h=>h.id!==id));
+    closeOverlay('del-overlay');showToast('Festivo eliminado');renderCalendar();
+  };
+  document.getElementById('del-overlay').classList.add('open');
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function today(){return new Date().toISOString().split('T')[0];}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmt(s){if(!s)return '—';const d=new Date(s+'T12:00:00');return d.toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});}
+
+// ══════ TOAST ══════
+function showToast(msg,type='ok'){
+  const c=document.getElementById('toast');
+  const d=document.createElement('div');d.className='toast-item';
+  d.style.background=type==='err'?'#b91c1c':type==='info'?'#1e3a8a':'#1e293b';
+  d.textContent=msg;c.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0';setTimeout(()=>d.remove(),400);},2800);
+}
+
+// ══════ NAV ══════
+let _currentView='s';
+function sv(v){
+  ['c','s','u','l'].forEach(x=>document.getElementById('v'+x).classList.toggle('on',x===v));
+  ['btnCal','btnSol','btnList','btnUsers'].forEach(id=>document.getElementById(id)?.classList.remove('on'));
+  _currentView=v;
+  if(v==='c'){document.getElementById('btnCal').classList.add('on');populateCalDeptFilter();renderCalendar();}
+  if(v==='s'){document.getElementById('btnSol').classList.add('on');populateSolYear();renderSolicitudes();}
+  if(v==='l'){document.getElementById('btnList').classList.add('on');renderSummary();}
+  if(v==='u'){document.getElementById('btnUsers').classList.add('on');renderUsers();}
+}
+
+// ══════ CALENDAR ══════
+let _calYear=new Date().getFullYear(), _calMonth=new Date().getMonth();
+let _calView='monthly', _dayDetailDate=null;
+
+function changeMonth(d){
+  if(_calView==='annual'){_calYear+=d;renderCalendar();return;}
+  if(_calView==='daily'){
+    const dt=new Date(_calYear,_calMonth,_calDay||1);
+    dt.setDate(dt.getDate()+d);
+    _calYear=dt.getFullYear();_calMonth=dt.getMonth();_calDay=dt.getDate();
+    renderCalendar();return;
+  }
+  _calMonth+=d;if(_calMonth>11){_calMonth=0;_calYear++;}if(_calMonth<0){_calMonth=11;_calYear--;}
+  renderCalendar();
+}
+function goToday(){_calYear=new Date().getFullYear();_calMonth=new Date().getMonth();_calDay=new Date().getDate();renderCalendar();}
+function onCalViewChange(){
+  _calView=document.getElementById('cal-view-sel').value;
+  renderCalendar();
+}
+
+let _calDay=new Date().getDate();
+
+function getUserColor(uid){const u=getUsers().find(x=>x.id===uid);return u?u.color:'#6b7280';}
+function getUserName(uid){const u=getUsers().find(x=>x.id===uid);return u?u.name:'(usuario)';}
+function evIcon(t){return t==='vacaciones'?'🏖️':t==='asunto'?'🕐':'🩺';}
+function evLabel(t){return t==='vacaciones'?'Vacaciones':t==='asunto'?'Asuntos propios':'Cita médica';}
+function evColor(type,userColor){
+  const col=userColor||'#6b7280';
+  const bg=type==='vacaciones'?col+'28':type==='medica'?col+'20':col+'33';
+  return {col,bg};
+}
+
+function getEventsForDate(dateStr){
+  return getEvents().filter(ev=>{
+    if(ev.type==='asunto'||ev.type==='medica') return ev.start===dateStr;
+    return dateStr>=ev.start && dateStr<=ev.end;
+  });
+}
+
+function renderCalendar(){
+  const calBody=document.getElementById('cal-body');
+  const prevBtn=document.querySelector('.cal-nav');
+  const sel=document.getElementById('cal-view-sel');
+  if(sel)sel.value=_calView;
+
+  if(_calView==='annual'){renderAnnualView(calBody);return;}
+  if(_calView==='daily'){renderDailyView(calBody);return;}
+  renderMonthlyView(calBody);
+}
+
+function renderMonthlyView(container){
+  document.getElementById('cal-title').textContent=MONTH_NAMES[_calMonth]+' '+_calYear;
+  const filterUser=document.getElementById('cal-user-filter')?.value||'';
+  const filterDept=document.getElementById('cal-dept-filter')?.value||'';
+  const todayStr=today();
+  const hols=getHolidaysForYear(String(_calYear));
+  const first=new Date(_calYear,_calMonth,1);
+  let startDow=first.getDay();startDow=startDow===0?6:startDow-1;
+  const dim=new Date(_calYear,_calMonth+1,0).getDate();
+  const dip=new Date(_calYear,_calMonth,0).getDate();
+  let cells=[];
+  for(let i=0;i<startDow;i++){
+    const d=dip-startDow+1+i;
+    const pm=_calMonth===0?12:_calMonth;const py=_calMonth===0?_calYear-1:_calYear;
+    cells.push({date:`${py}-${String(pm).padStart(2,'0')}-${String(d).padStart(2,'0')}`,day:d,otherMonth:true});
+  }
+  for(let d=1;d<=dim;d++) cells.push({date:`${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,day:d,otherMonth:false});
+  const rem=cells.length%7===0?0:7-(cells.length%7);
+  for(let i=1;i<=rem;i++){const nm=_calMonth+2>12?1:_calMonth+2;const ny=nm===1?_calYear+1:_calYear;cells.push({date:`${ny}-${String(nm).padStart(2,'0')}-${String(i).padStart(2,'0')}`,day:i,otherMonth:true});}
+  let html=`<div class="cal-grid">${DOW_NAMES.map(d=>`<div class="cal-dow">${d}</div>`).join('')}`;
+  html+=cells.map(cell=>{
+    const isToday=cell.date===todayStr;
+    const wknd=isWeekend(cell.date);
+    const holType=hols.nacional.includes(cell.date)?'nacional':hols.madrid.includes(cell.date)?'madrid':null;
+    let evs=getEventsForDate(cell.date);
+    if(filterDept) evs=evs.filter(e=>{const u=getUsers().find(x=>x.id===e.userId);return u&&u.dept===filterDept;});
+    if(filterUser) evs=evs.filter(e=>e.userId===filterUser);
+    let holHtml='';
+    if(holType==='nacional'){const nm=getHolidayName(cell.date)||'Festivo nacional';holHtml=`<div class="cal-event ev-nat" title="${esc(nm)}">🇪🇸 ${esc(nm)}</div>`;}
+    else if(holType==='madrid'){const nm=getHolidayName(cell.date)||'Festivo CAM';holHtml=`<div class="cal-event ev-reg" title="${esc(nm)}">🏛️ ${esc(nm)}</div>`;}
+    const evHtml=evs.slice(0,2).map(ev=>{
+      const uc=getUserColor(ev.userId);
+      const {col,bg}=evColor(ev.type,uc);
+      return `<div class="cal-event" style="background:${bg};color:${col};border-left:3px solid ${col}" title="${esc(getUserName(ev.userId))}">${evIcon(ev.type)} ${esc(getUserName(ev.userId))}</div>`;
+    }).join('');
+    const more=evs.length>2?`<div style="font-size:9px;color:var(--muted);padding:1px 4px">+${evs.length-2} más</div>`:'';
+    const bgStyle=wknd&&!isToday?'background:#f9fafb;':holType?'background:'+(holType==='nacional'?'#fff0f6':'#f5f3ff')+';':'';
+    return `<div class="cal-cell${cell.otherMonth?' other-month':''}${isToday?' today':''}" style="${bgStyle}" onclick="openDayDetail('${cell.date}')">
+      <div class="cal-day">${cell.day}</div>${holHtml}${evHtml}${more}</div>`;
+  }).join('');
+  html+=`</div>`;
+  container.innerHTML=html;
+  updateLegendUsers();
+}
+
+function renderAnnualView(container){
+  document.getElementById('cal-title').textContent='Año '+_calYear;
+  const filterUser=document.getElementById('cal-user-filter')?.value||'';
+  const filterDept=document.getElementById('cal-dept-filter')?.value||'';
+  const todayStr=today();
+  const hols=getHolidaysForYear(String(_calYear));
+  let html=`<div class="annual-grid">`;
+  for(let m=0;m<12;m++){
+    const dim=new Date(_calYear,m+1,0).getDate();
+    const first=new Date(_calYear,m,1);
+    let startDow=first.getDay();startDow=startDow===0?6:startDow-1;
+    let miniHtml=DOW_NAMES.map(d=>`<div class="mini-dow">${d[0]}</div>`).join('');
+    for(let i=0;i<startDow;i++) miniHtml+=`<div class="mini-cell other-m"><span class="mini-day-num"></span></div>`;
+    for(let d=1;d<=dim;d++){
+      const dateStr=`${_calYear}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      let evs=getEventsForDate(dateStr);
+      if(filterDept) evs=evs.filter(e=>{const u=getUsers().find(x=>x.id===e.userId);return u&&u.dept===filterDept;});
+      if(filterUser) evs=evs.filter(e=>e.userId===filterUser);
+      const isToday=dateStr===todayStr;
+      const wknd=isWeekend(dateStr);
+      const holType=hols.nacional.includes(dateStr)?'nacional':hols.madrid.includes(dateStr)?'madrid':null;
+      // Color bars
+      const seenUsers=new Set();
+      const bars=evs.filter(e=>{if(seenUsers.has(e.userId))return false;seenUsers.add(e.userId);return true;}).slice(0,4).map(e=>{
+        const col=getUserColor(e.userId);
+        const opacity=e.type==='vacaciones'?'dd':e.type==='medica'?'88':'bb';
+        return `<span style="flex:1;background:${col}${opacity};min-width:3px"></span>`;
+      }).join('');
+      // Holiday bars
+      const holBar=holType==='nacional'?`<span style="flex:1;background:#db277788;min-width:3px"></span>`:holType==='madrid'?`<span style="flex:1;background:#7c3aed88;min-width:3px"></span>`:'';
+      const barsHtml=(bars||holBar)?`<div class="mini-ev-bars">${bars||holBar}</div>`:'';
+      const names=[...evs.map(e=>getUserName(e.userId)+' ('+evLabel(e.type)+')'),holType==='nacional'?'Festivo nacional':holType==='madrid'?'Festivo CAM':''].filter(Boolean).join(', ');
+      let bgCls=wknd?' weekend':'';
+      if(holType==='nacional') bgCls=' hol-nat';
+      else if(holType==='madrid') bgCls=' hol-reg';
+      miniHtml+=`<div class="mini-cell${bgCls}${isToday?' today-m':''}" onclick="goToDateDetail('${dateStr}')" title="${names||dateStr}">
+        <span class="mini-day-num">${d}</span>${barsHtml}</div>`;
+    }
+    html+=`<div class="mini-month"><div class="mini-month-title">${MONTH_NAMES[m]}</div><div class="mini-grid">${miniHtml}</div></div>`;
+  }
+  html+=`</div>`;
+  container.innerHTML=html;
+  updateLegendUsers();
+}
+
+function goToDateDetail(dateStr){
+  const d=new Date(dateStr+'T12:00:00');
+  _calYear=d.getFullYear();_calMonth=d.getMonth();_calDay=d.getDate();
+  openDayDetail(dateStr);
+}
+
+function renderDailyView(container){
+  const dateStr=`${_calYear}-${String(_calMonth+1).padStart(2,'0')}-${String(_calDay).padStart(2,'0')}`;
+  const d=new Date(dateStr+'T12:00:00');
+  document.getElementById('cal-title').textContent=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const filterUser=document.getElementById('cal-user-filter')?.value||'';
+  let evs=getEventsForDate(dateStr);
+  if(filterUser) evs=evs.filter(e=>e.userId===filterUser);
+  const todayStr=today();
+  const isToday=dateStr===todayStr;
+  let html=`<div style="padding:20px">`;
+  if(isToday) html+=`<div style="display:inline-block;background:#eff6ff;color:var(--blue);border-radius:20px;padding:3px 12px;font-size:12px;font-weight:600;margin-bottom:14px">Hoy</div>`;
+  if(evs.length===0){html+=`<div style="color:var(--muted);font-size:14px;padding:20px 0">Sin solicitudes este día.</div>`;}
+  else{
+    html+=evs.map(ev=>{
+      const uc=getUserColor(ev.userId);
+      const {col,bg}=evColor(ev.type,uc);
+      const sub=ev.type==='vacaciones'?`Del ${fmt(ev.start)} al ${fmt(ev.end)}`:`${ev.hours||1}h`;
+      const editBtn=_editMode?`<button class="btn bo bs" onclick="editEvent('${ev.id}')" style="margin-left:auto">✏️</button>`:'';
+      return `<div style="display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;border:1px solid ${col}33;background:${bg};margin-bottom:10px">
+        <span style="font-size:22px">${evIcon(ev.type)}</span>
+        <div style="flex:1">
+          <div style="font-weight:700;color:${col};font-size:14px">${esc(getUserName(ev.userId))}</div>
+          <div style="font-size:12px;color:var(--muted)">${evLabel(ev.type)} · ${sub}</div>
+          ${ev.notes?`<div style="font-size:11px;color:var(--muted);margin-top:3px">${esc(ev.notes)}</div>`:''}
+        </div>${editBtn}</div>`;
+    }).join('');
+  }
+  if(_editMode) html+=`<button class="btn bb" style="margin-top:10px" onclick="openAddEventForDate()">➕ Añadir solicitud</button>`;
+  html+=`</div>`;
+  container.innerHTML=html;
+  updateLegendUsers();
+}
+
+function updateLegendUsers(){
+  const ul=document.getElementById('legend-user-rows');
+  if(!ul)return;
+  const dept=document.getElementById('cal-dept-filter')?.value||'';
+  const users=dept?getUsers().filter(u=>u.dept===dept):getUsers();
+  ul.innerHTML=users.map(u=>`<div class="lp-row"><span style="width:12px;height:12px;border-radius:50%;background:${u.color};display:inline-block;flex-shrink:0"></span><span>${esc(u.name)}</span></div>`).join('');
+}
+
+function toggleLegend(e){
+  e.stopPropagation();
+  document.getElementById('legend-popup').classList.toggle('open');
+  updateLegendUsers();
+}
+document.addEventListener('click',()=>{document.getElementById('legend-popup')?.classList.remove('open');});
+
+const DEPTS=['SAT','Soporte','Exportación','Expediciones','Comercial','Taller','Mantenimiento','Producción','Ingeniería','Desarrollo','Administración'];
+
+function getActiveDepts(){
+  const used=new Set(getUsers().map(u=>u.dept).filter(Boolean));
+  const active=DEPTS.filter(d=>used.has(d));
+  return active.length?active:[...DEPTS];
+}
+
+function populateDeptFilter(selId){
+  const sel=document.getElementById(selId);if(!sel)return;
+  const depts=getActiveDepts();
+  const cur=sel.value;
+  sel.innerHTML=['<option value="">Todos los departamentos</option>',...depts.map(d=>`<option value="${esc(d)}"${d===cur?' selected':''}>${esc(d)}</option>`)].join('');
+  // Keep current selection if still valid
+  if(cur&&depts.includes(cur)) sel.value=cur;
+}
+
+function populateCalDeptFilter(){
+  populateDeptFilter('cal-dept-filter',onCalDeptChange);
+  populateCalUserFilter();
+}
+
+function onCalDeptChange(){
+  populateCalUserFilter();
+  renderCalendar();
+}
+
+function populateCalUserFilter(){
+  const sel=document.getElementById('cal-user-filter');if(!sel)return;
+  const dept=document.getElementById('cal-dept-filter')?.value||'';
+  const cur=sel.value;
+  const users=dept?getUsers().filter(u=>u.dept===dept):getUsers();
+  sel.innerHTML='<option value="">Todos los usuarios</option>'+users.map(u=>`<option value="${u.id}"${u.id===cur?' selected':''}>${esc(u.name)}</option>`).join('');
+}
+
+function populateAllDeptFilters(){
+  populateDeptFilter('cal-dept-filter'); populateCalUserFilter();
+  populateDeptFilter('sol-dept');
+  populateDeptFilter('summary-dept');
+  populateDeptFilter('users-dept');
+}
+
+// ══════ DAY DETAIL ══════
+function openDayDetail(dateStr){
+  _dayDetailDate=dateStr;
+  const evs=getEventsForDate(dateStr);
+  const d=new Date(dateStr+'T12:00:00');
+  const year=String(d.getFullYear());
+  const hols=getHolidaysForYear(year);
+  const holType=hols.nacional.includes(dateStr)?'nacional':hols.madrid.includes(dateStr)?'madrid':null;
+  const holName=getHolidayName(dateStr);
+  const manualHol=hols.manual.find(h=>h.date===dateStr);
+  document.getElementById('day-popup-title').textContent=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('day-add-btn').style.display=_editMode?'inline-flex':'none';
+  let html='';
+  // Show holiday info first
+  if(holType){
+    const holColor=holType==='nacional'?'#db2777':'#7c3aed';
+    const editBtn=(_editMode&&manualHol)?`<button class="btn bo bs" style="margin-left:auto;padding:3px 9px" onclick="editHoliday('${manualHol.id}');closeOverlay('day-overlay')">✏️</button>`:'';
+    html+=`<div class="ev-item" style="border-left:4px solid ${holColor};background:${holType==='nacional'?'#fce7f3':'#ede9fe'}">
+      <span style="font-size:15px">${holType==='nacional'?'🇪🇸':'🏛️'}</span>
+      <div style="flex:1"><div style="font-weight:600;color:${holColor};font-size:13px">${esc(holName||'Festivo')}</div>
+      <div style="font-size:11px;color:var(--muted)">No computa en días de vacaciones</div></div>
+      ${editBtn}
+    </div>`;
+  }
+  if(isWeekend(dateStr)&&!holType) html+=`<div style="font-size:12px;color:var(--muted);padding:4px 0 8px;font-style:italic">Fin de semana — no computa en vacaciones</div>`;
+  if(evs.length===0&&!holType&&!isWeekend(dateStr)) html+=`<div style="color:var(--muted);font-size:13px;padding:10px 0">Sin solicitudes este día.</div>`;
+  html+=evs.map(ev=>{
+    const uc=getUserColor(ev.userId);
+    const {col}=evColor(ev.type,uc);
+    const sub=ev.type==='vacaciones'?`Del ${fmt(ev.start)} al ${fmt(ev.end)}`:`${ev.hours||1}h`;
+    const editBtn=_editMode?`<button class="btn bo bs" style="margin-left:auto;padding:3px 9px" onclick="editEvent('${ev.id}');closeOverlay('day-overlay')">✏️</button>`:'';
+    return `<div class="ev-item" style="border-left:4px solid ${col}">
+      <span style="font-size:15px">${evIcon(ev.type)}</span>
+      <div style="flex:1">
+        <div style="font-weight:600;color:${col};font-size:13px">${esc(getUserName(ev.userId))} <span style="font-weight:400;font-size:11px;color:var(--muted)">${evLabel(ev.type)}</span></div>
+        <div style="font-size:11px;color:var(--muted)">${sub}</div>
+        ${ev.notes?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${esc(ev.notes)}</div>`:''}
+      </div>${editBtn}</div>`;
+  }).join('');
+  document.getElementById('day-popup-content').innerHTML=html;
+  document.getElementById('day-overlay').classList.add('open');
+}
+function openAddEventForDate(){closeOverlay('day-overlay');openAddEvent(_dayDetailDate);}
+
+// ══════ SOLICITUDES VIEW ══════
+function getVisibleYears(){
+  const cy=new Date().getFullYear();
+  // Show current year + next 2. If we're past 2026 show current+2
+  const base=Math.max(cy,2026);
+  const years=new Set([base,base+1,base+2]);
+  // Also include years that have actual event data
+  getEvents().forEach(e=>{if(e.start){const y=parseInt(e.start.substring(0,4));if(y>=2026)years.add(y);}});
+  return [...years].sort((a,b)=>a-b);
+}
+
+function populateSolYear(){
+  const sel=document.getElementById('sol-year');if(!sel)return;
+  const years=getVisibleYears();
+  const cy=new Date().getFullYear();
+  const def=String(Math.max(cy,2026));
+  const cur=sel.value&&years.includes(parseInt(sel.value))?sel.value:def;
+  sel.innerHTML=years.map(y=>`<option value="${y}"${String(y)===cur?' selected':''}>${y}</option>`).join('');
+}
+
+function populateSummaryYears(){
+  const sel=document.getElementById('summary-year');if(!sel)return;
+  const years=getVisibleYears();
+  const cy=new Date().getFullYear();
+  const def=String(Math.max(cy,2026));
+  const cur=sel.value&&years.includes(parseInt(sel.value))?sel.value:def;
+  sel.innerHTML=years.map(y=>`<option value="${y}"${String(y)===cur?' selected':''}>${y}</option>`).join('');
+}
+
+function pillHtml(icon,used,total,unit,type){
+  const full=used>=total;
+  const warn=!full&&used/total>=0.75;
+  const numCls=full?'ep-full':warn?'ep-warn':'ep-ok';
+  const style=full?'border-color:#fca5a5;background:#fff1f2':'';
+  return `<span class="entitle-pill" style="${style}" title="${evLabel(type)}">
+    ${icon}
+    <span class="${numCls}" style="font-size:13px;font-weight:800">${used}</span>
+    <span style="color:var(--muted);font-size:11px">/ ${total} ${unit}</span>
+  </span>`;
+}
+
+function renderSolicitudes(){
+  populateDeptFilter('sol-dept');
+  const year=document.getElementById('sol-year')?.value||String(Math.max(new Date().getFullYear(),2026));
+  const dept=document.getElementById('sol-dept')?.value||'';
+  const allUsers=getUsers();
+  const users=dept?allUsers.filter(u=>u.dept===dept):allUsers;
+  const events=getEvents().filter(e=>e.start&&e.start.startsWith(year));
+  const wrap=document.getElementById('sol-wrap');
+  if(!users.length){wrap.innerHTML='<div class="tc" style="padding:40px;text-align:center;color:var(--muted)">No hay usuarios en este departamento.</div>';return;}
+
+  wrap.innerHTML=users.map(u=>{
+    const uEvs=events.filter(e=>e.userId===u.id).sort((a,b)=>a.start.localeCompare(b.start));
+    const vacUsed=calcVacDays(u.id,year);
+    const asuntoUsed=calcAsuntoHours(u.id,year);
+    const medicaUsed=calcMedicaHours(u.id,year);
+    const vacTotal=u.vacDays||22;
+    const asuntoTotal=u.asuntoHours||180;
+    const medicaTotal=u.medicaHours||16;
+
+    const rows=uEvs.length===0
+      ?`<div style="color:var(--muted);font-size:13px;padding:8px 2px">Sin solicitudes en ${year}.</div>`
+      :uEvs.map(ev=>{
+        let period='';
+        if(ev.type==='vacaciones') period=`${fmt(ev.start)} → ${fmt(ev.end)}`;
+        else period=`${fmt(ev.start)} · ${ev.hours||1}h`;
+        const typeColors={vacaciones:'sol-vac',asunto:'sol-asunto',medica:'sol-medica'};
+        const delBtn=_editMode?`<button class="btn brd bs" onclick="quickDeleteEvent('${ev.id}')" style="margin-left:auto;padding:3px 9px" title="Eliminar">🗑️</button>`:'';
+        const editBtn=_editMode?`<button class="btn bo bs" onclick="editEvent('${ev.id}')" style="padding:3px 9px">✏️</button>`:'';
+        return `<div class="sol-row">
+          <span class="sol-badge ${typeColors[ev.type]||'sol-vac'}">${evIcon(ev.type)} ${evLabel(ev.type)}</span>
+          <span style="font-size:13px;color:var(--txt);font-weight:500">${period}</span>
+          ${ev.notes?`<span style="font-size:11px;color:var(--muted)">${esc(ev.notes)}</span>`:''}
+          ${editBtn}${delBtn}
+        </div>`;
+      }).join('');
+
+    return `<div class="sol-card">
+      <div class="sol-card-head">
+        <span class="color-dot" style="background:${u.color};width:16px;height:16px"></span>
+        <span style="font-weight:700;font-size:14px">${esc(u.name)}</span>
+        <span style="font-size:12px;color:var(--muted)">${esc(u.dept)}</span>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-left:auto">
+          ${pillHtml('🏖️',vacUsed,vacTotal,'días','vacaciones')}
+          ${pillHtml('🕐',asuntoUsed,asuntoTotal,'h','asunto')}
+          ${pillHtml('🩺',medicaUsed,medicaTotal,'h','medica')}
+        </div>
+        ${_editMode?`<button class="btn bb bs" onclick="openAddEventForUser('${u.id}')">➕</button>`:''}
+      </div>
+      <div class="sol-card-body">${rows}</div>
+    </div>`;
+  }).join('');
+}
+
+function quickDeleteEvent(id){
+  const ev=getEvents().find(e=>e.id===id);
+  if(!ev)return;
+  document.getElementById('del-desc').textContent=`¿Eliminar esta solicitud (${evLabel(ev.type)}, ${fmt(ev.start)})?`;
+  document.getElementById('del-confirm-btn').onclick=()=>{
+    saveEvents(getEvents().filter(e=>e.id!==id));
+    closeOverlay('del-overlay');showToast('Solicitud eliminada');
+    renderSolicitudes();if(_currentView==='c')renderCalendar();if(_currentView==='l')renderSummary();
+  };
+  document.getElementById('del-overlay').classList.add('open');
+}
+
+function openAddEventForUser(userId){openAddEvent(null,userId);}
+
+// ══════ RESUMEN VIEW ══════
+function renderSummary(){
+  populateSummaryYears();
+  populateDeptFilter('summary-dept');
+  const year=document.getElementById('summary-year')?.value||String(Math.max(new Date().getFullYear(),2026));
+  const dept=document.getElementById('summary-dept')?.value||'';
+  const allUsers=getUsers();
+  const users=dept?allUsers.filter(u=>u.dept===dept):allUsers;
+  const events=getEvents().filter(e=>e.start&&e.start.startsWith(year));
+  const wrap=document.getElementById('summary-wrap');
+  if(!users.length){wrap.innerHTML='<div class="tc" style="padding:40px;text-align:center;color:var(--muted)">Sin usuarios en este departamento.</div>';return;}
+  wrap.innerHTML=users.map(u=>{
+    const uEvs=events.filter(e=>e.userId===u.id).sort((a,b)=>a.start.localeCompare(b.start));
+    const mkRows=(type,emptyMsg)=>{
+      const evs=uEvs.filter(e=>e.type===type);
+      if(!evs.length) return `<tr><td colspan="3" style="color:var(--muted);font-style:italic;padding:8px 12px">${emptyMsg}</td></tr>`;
+      return evs.map(ev=>{
+        const d1=new Date(ev.start+'T12:00:00'),d2=new Date(ev.end+'T12:00:00');
+        const days=Math.round((d2-d1)/86400000)+1;
+        const detail=type==='vacaciones'?`${days} día${days===1?'':'s'}`:`${ev.hours||1}h`;
+        const editBtn=_editMode?`<button class="btn bo bs" onclick="editEvent('${ev.id}')">✏️</button> <button class="btn brd bs" onclick="quickDeleteEvent('${ev.id}')">🗑️</button>`:'';
+        return `<tr>
+          <td>${evIcon(type)} <b>${fmt(ev.start)}</b>${type==='vacaciones'?' → <b>'+fmt(ev.end)+'</b>':''}</td>
+          <td style="color:var(--muted)">${detail}${ev.notes?` · ${esc(ev.notes)}`:''}</td>
+          <td style="white-space:nowrap">${editBtn}</td>
+        </tr>`;
+      }).join('');
+    };
+    const vacUsed=calcVacDays(u.id,year);
+    const asuntoUsed=calcAsuntoHours(u.id,year);
+    const medicaUsed=calcMedicaHours(u.id,year);
+    const asuntoTotal=u.asuntoHours||180;
+    return `<div class="sol-card" style="margin-bottom:16px">
+      <div class="sol-card-head">
+        <span class="color-dot" style="background:${u.color};width:16px;height:16px"></span>
+        <span style="font-weight:700;font-size:15px">${esc(u.name)}</span>
+        <span style="font-size:12px;color:var(--muted)">${esc(u.dept)}</span>
+        <div style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap">
+          ${pillHtml('🏖️',vacUsed,u.vacDays||22,'días','vacaciones')}
+          ${pillHtml('🕐',asuntoUsed,asuntoTotal,'h','asunto')}
+          ${pillHtml('🩺',medicaUsed,u.medicaHours||16,'h','medica')}
+        </div>
+      </div>
+      <div class="sol-card-body" style="padding:0">
+        <table style="font-size:13px">
+          <thead><tr><th colspan="3" style="background:#f8fafc;padding:8px 14px;font-size:11px;color:var(--muted)">🏖️ VACACIONES</th></tr></thead>
+          <tbody>${mkRows('vacaciones','Sin vacaciones registradas')}</tbody>
+          <thead><tr><th colspan="3" style="background:#fefce8;padding:8px 14px;font-size:11px;color:#92400e">🕐 ASUNTOS PROPIOS</th></tr></thead>
+          <tbody>${mkRows('asunto','Sin asuntos propios registrados')}</tbody>
+          <thead><tr><th colspan="3" style="background:#f0fdf4;padding:8px 14px;font-size:11px;color:#166534">🩺 CITAS MÉDICAS</th></tr></thead>
+          <tbody>${mkRows('medica','Sin citas médicas registradas')}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════ CALCULOS ══════
+function calcVacDays(userId,year){
+  return getEvents().filter(e=>e.userId===userId&&e.type==='vacaciones'&&e.start.startsWith(year)).reduce((a,e)=>{
+    return a+countWorkingDays(e.start,e.end||e.start);
+  },0);
+}
+function calcAsuntoHours(userId,year){
+  return Math.round(getEvents().filter(e=>e.userId===userId&&e.type==='asunto'&&e.start.startsWith(year)).reduce((a,e)=>a+(parseFloat(e.hours)||1),0)*10)/10;
+}
+function calcMedicaHours(userId,year){
+  return Math.round(getEvents().filter(e=>e.userId===userId&&e.type==='medica'&&e.start.startsWith(year)).reduce((a,e)=>a+(parseFloat(e.hours)||1),0)*10)/10;
+}
+
+// ══════ EVENT CRUD ══════
+let _editEventId=null, _selectedHours=1;
+
+function openAddEvent(prefillDate,prefillUser){
+  _editEventId=null;
+  document.getElementById('event-overlay-title').textContent='➕ Nueva solicitud';
+  document.getElementById('ev-del-btn').style.display='none';
+  const users=getUsers();
+  document.getElementById('ev-user').innerHTML=users.map(u=>`<option value="${u.id}"${u.id===prefillUser?' selected':''}>${esc(u.name)}</option>`).join('');
+  document.getElementById('ev-type').value='vacaciones';
+  const dt=prefillDate||today();
+  document.getElementById('ev-start').value=dt;
+  document.getElementById('ev-end').value=dt;
+  document.getElementById('ev-notes').value='';
+  _selectedHours=1;
+  onEvTypeChange();
+  document.getElementById('event-overlay').classList.add('open');
+}
+
+function editEvent(id){
+  const ev=getEvents().find(e=>e.id===id);if(!ev)return;
+  _editEventId=id;
+  document.getElementById('event-overlay-title').textContent='✏️ Editar solicitud';
+  document.getElementById('ev-del-btn').style.display='inline-flex';
+  const users=getUsers();
+  document.getElementById('ev-user').innerHTML=users.map(u=>`<option value="${u.id}"${u.id===ev.userId?' selected':''}>${esc(u.name)}</option>`).join('');
+  document.getElementById('ev-type').value=ev.type;
+  document.getElementById('ev-start').value=ev.start;
+  document.getElementById('ev-end').value=ev.end||ev.start;
+  document.getElementById('ev-notes').value=ev.notes||'';
+  _selectedHours=ev.hours||1;
+  onEvTypeChange();
+  document.getElementById('event-overlay').classList.add('open');
+}
+
+function onEvTypeChange(){
+  const type=document.getElementById('ev-type').value;
+  document.getElementById('ev-end-wrap').style.display=type==='vacaciones'?'':'none';
+  document.getElementById('ev-hours-wrap').style.display=(type==='asunto'||type==='medica')?'block':'none';
+  if(type==='asunto'||type==='medica') refreshHourChips();
+}
+
+function refreshHourChips(){
+  const type=document.getElementById('ev-type').value;
+  if(type==='vacaciones') return;
+  const userId=document.getElementById('ev-user').value;
+  const year=(document.getElementById('ev-start').value||today()).substring(0,4);
+  const u=getUsers().find(x=>x.id===userId);
+  let used, total;
+  if(type==='medica'){
+    used=calcMedicaHours(userId,year);
+    total=u?.medicaHours||16;
+    if(_editEventId){const ev=getEvents().find(e=>e.id===_editEventId);if(ev&&ev.type==='medica')used=Math.max(0,used-(parseFloat(ev.hours)||1));}
+  } else {
+    used=calcAsuntoHours(userId,year);
+    total=u?.asuntoHours||180;
+    if(_editEventId){const ev=getEvents().find(e=>e.id===_editEventId);if(ev&&ev.type==='asunto')used=Math.max(0,used-(parseFloat(ev.hours)||1));}
+  }
+  const remaining=Math.max(0,total-used);
+  const infoEl=document.getElementById('ev-hours-info');
+  const full=remaining<=0;
+  infoEl.innerHTML=full
+    ?`<span style="color:#b91c1c;font-weight:700">⛔ Límite alcanzado: ${used}/${total}h consumidas</span>`
+    :`<span style="color:var(--muted)">Disponibles: <b style="color:${remaining<2?'#d97706':'#16a34a'}">${remaining.toFixed(1)}h</b> de ${total}h anuales</span>`;
+  document.getElementById('hour-chips').innerHTML=HOUR_CHIPS.map(h=>{
+    const over=h>remaining;
+    return `<div class="hour-chip${h===_selectedHours?' sel':''}${over?' disabled':''}" onclick="${over?`showToast('Superarías el límite de ${total}h disponibles (quedan ${remaining.toFixed(1)}h)','err')`:`selectHour(${h})`}">${h}h</div>`;
+  }).join('');
+}
+
+function selectHour(h){_selectedHours=h;refreshHourChips();}
+
+function saveEvent(){
+  const type=document.getElementById('ev-type').value;
+  const start=document.getElementById('ev-start').value;
+  const end=type==='vacaciones'?(document.getElementById('ev-end').value||start):start;
+  const userId=document.getElementById('ev-user').value;
+  const hours=_selectedHours;
+  const notes=document.getElementById('ev-notes').value.trim();
+  if(!start){showToast('Selecciona una fecha','err');return;}
+  if(!userId){showToast('Selecciona un usuario','err');return;}
+  if(type==='vacaciones'&&end<start){showToast('La fecha fin no puede ser anterior al inicio','err');return;}
+
+  const year=start.substring(0,4);
+  const u=getUsers().find(x=>x.id===userId);
+
+  // Check vacation working-day limit
+  if(type==='vacaciones'){
+    const total=u?.vacDays||22;
+    let used=calcVacDays(userId,year);
+    if(_editEventId){const ev=getEvents().find(e=>e.id===_editEventId);if(ev&&ev.type==='vacaciones')used=Math.max(0,used-countWorkingDays(ev.start,ev.end||ev.start));}
+    const newDays=countWorkingDays(start,end);
+    if(used+newDays>total){
+      showToast(`Superarías el límite de ${total} días laborables. Tienes ${Math.max(0,total-used)} día(s) disponibles.`,'err');
+      return;
+    }
+  }
+
+  // Check limit for hours types
+  if(type==='asunto'||type==='medica'){
+    let used=type==='medica'?calcMedicaHours(userId,year):calcAsuntoHours(userId,year);
+    const total=type==='medica'?(u?.medicaHours||16):(u?.asuntoHours||180);
+    if(_editEventId){const ev=getEvents().find(e=>e.id===_editEventId);if(ev&&ev.type===type)used=Math.max(0,used-(parseFloat(ev.hours)||1));}
+    if(used+hours>total){
+      showToast(`Superarías el límite de ${total}h. Quedan ${Math.max(0,total-used).toFixed(1)}h disponibles.`,'err');
+      return;
+    }
+  }
+
+  const all=getEvents();
+  if(_editEventId){
+    const idx=all.findIndex(e=>e.id===_editEventId);
+    if(idx>=0)all[idx]={...all[idx],type,start,end,userId,hours,notes};
+  } else {
+    all.push({id:uid(),type,start,end,userId,hours,notes,created:today()});
+  }
+  saveEvents(all);
+  closeOverlay('event-overlay');
+  showToast('Solicitud guardada ✓');
+  if(_currentView==='c')renderCalendar();
+  if(_currentView==='s')renderSolicitudes();
+  if(_currentView==='l')renderSummary();
+}
+
+function deleteCurrentEvent(){
+  closeOverlay('event-overlay');
+  const id=_editEventId;
+  document.getElementById('del-desc').textContent='¿Eliminar esta solicitud? Esta acción no se puede deshacer.';
+  document.getElementById('del-confirm-btn').onclick=()=>{
+    saveEvents(getEvents().filter(e=>e.id!==id));
+    closeOverlay('del-overlay');showToast('Solicitud eliminada');
+    if(_currentView==='c')renderCalendar();
+    if(_currentView==='s')renderSolicitudes();
+    if(_currentView==='l')renderSummary();
+  };
+  document.getElementById('del-overlay').classList.add('open');
+}
+
+// ══════ USER CRUD ══════
+let _editUserId=null;
+function openAddUser(){
+  _editUserId=null;
+  document.getElementById('user-overlay-title').textContent='➕ Nuevo usuario';
+  document.getElementById('usr-del-btn').style.display='none';
+  document.getElementById('usr-name').value='';
+  document.getElementById('usr-email').value='';
+  document.getElementById('usr-dept').selectedIndex=0;
+  document.getElementById('usr-vac').value='22';
+  document.getElementById('usr-asunto').value='22.5';
+  document.getElementById('usr-medica').value='16';
+  document.getElementById('usr-year').value=new Date().getFullYear();
+  renderColorPick(USER_COLORS[getUsers().length%USER_COLORS.length]);
+  document.getElementById('user-overlay').classList.add('open');
+}
+function editUser(id){
+  const u=getUsers().find(x=>x.id===id);if(!u)return;
+  _editUserId=id;
+  document.getElementById('user-overlay-title').textContent='✏️ Editar usuario';
+  document.getElementById('usr-del-btn').style.display='inline-flex';
+  document.getElementById('usr-name').value=u.name||'';
+  document.getElementById('usr-email').value=u.email||'';
+  document.getElementById('usr-dept').value=u.dept||'Soporte';
+  document.getElementById('usr-vac').value=u.vacDays||22;
+  document.getElementById('usr-asunto').value=u.asuntoHours||180;
+  document.getElementById('usr-medica').value=u.medicaHours||16;
+  document.getElementById('usr-year').value=u.year||new Date().getFullYear();
+  renderColorPick(u.color||USER_COLORS[0]);
+  document.getElementById('user-overlay').classList.add('open');
+}
+function renderColorPick(selected){
+  const nc=normalizeColor(selected);
+  document.getElementById('color-pick-wrap').innerHTML=USER_COLORS.map(c=>`
+    <div class="color-opt${normalizeColor(c)===nc?' sel':''}" style="background:${c}" onclick="selectColor('${c}')"></div>`).join('');
+  const inp=document.getElementById('usr-custom-color');
+  if(inp&&nc.startsWith('#')&&nc.length===7) inp.value=nc;
+}
+function selectColor(c){
+  const nc=normalizeColor(c);
+  document.querySelectorAll('.color-opt').forEach(el=>el.classList.toggle('sel',normalizeColor(el.style.background)===nc));
+  const inp=document.getElementById('usr-custom-color');
+  if(inp&&nc.startsWith('#')&&nc.length===7) inp.value=nc;
+}
+function normalizeColor(c){
+  if(!c)return '';if(c.startsWith('#'))return c.toLowerCase();
+  const m=c.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if(m)return '#'+[m[1],m[2],m[3]].map(n=>parseInt(n).toString(16).padStart(2,'0')).join('');return c;
+}
+function getSelectedColor(){
+  const el=document.querySelector('.color-opt.sel');
+  if(el) return normalizeColor(el.style.background);
+  const inp=document.getElementById('usr-custom-color');
+  return inp?inp.value:USER_COLORS[0];
+}
+function saveUser(){
+  const name=document.getElementById('usr-name').value.trim();
+  const dept=document.getElementById('usr-dept').value;
+  const email=document.getElementById('usr-email').value.trim();
+  const vacDays=parseFloat(document.getElementById('usr-vac').value)||22;
+  const asuntoHours=parseFloat(document.getElementById('usr-asunto').value)||180;
+  const medicaHours=parseFloat(document.getElementById('usr-medica').value)||16;
+  const year=parseInt(document.getElementById('usr-year').value)||new Date().getFullYear();
+  const color=getSelectedColor();
+  if(!name){showToast('El nombre es obligatorio','err');return;}
+  const all=getUsers();
+  if(_editUserId){
+    const idx=all.findIndex(u=>u.id===_editUserId);
+    if(idx>=0)all[idx]={...all[idx],name,dept,email,vacDays,asuntoHours,medicaHours,year,color};
+  } else {
+    all.push({id:uid(),name,dept,email,vacDays,asuntoHours,medicaHours,year,color,created:today()});
+  }
+  saveUsers(all);closeOverlay('user-overlay');showToast('Usuario guardado ✓');
+  renderUsers();populateCalUserFilter();
+}
+function deleteCurrentUser(){
+  closeOverlay('user-overlay');const id=_editUserId;
+  const u=getUsers().find(x=>x.id===id);
+  document.getElementById('del-desc').textContent=`¿Eliminar el usuario "${u?.name}"? También se eliminarán sus solicitudes.`;
+  document.getElementById('del-confirm-btn').onclick=()=>{
+    saveUsers(getUsers().filter(x=>x.id!==id));
+    saveEvents(getEvents().filter(e=>e.userId!==id));
+    closeOverlay('del-overlay');showToast('Usuario eliminado');
+    renderUsers();renderCalendar();populateCalUserFilter();
+  };
+  document.getElementById('del-overlay').classList.add('open');
+}
+function renderUsers(){
+  populateDeptFilter('users-dept');
+  const dept=document.getElementById('users-dept')?.value||'';
+  const allUsers=getUsers();
+  const users=dept?allUsers.filter(u=>u.dept===dept):allUsers;
+  document.getElementById('add-user-btn').style.display=_editMode?'inline-flex':'none';
+  document.getElementById('user-actions-th').style.display=_editMode?'':'none';
+  const tbody=document.getElementById('users-tbody');
+  if(!users.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--muted)">Sin usuarios en este departamento.</td></tr>';return;}
+  tbody.innerHTML=users.map(u=>`<tr>
+    <td><span class="color-dot" style="background:${u.color}"></span></td>
+    <td style="font-weight:600">${esc(u.name)}</td>
+    <td style="color:var(--muted)">${esc(u.dept)}</td>
+    <td style="color:var(--muted)">${esc(u.email||'—')}</td>
+    <td style="text-align:center">${u.vacDays||22}</td>
+    <td style="text-align:center">${u.asuntoHours||180}</td>
+    <td style="text-align:center">${u.medicaHours||16}</td>
+    <td style="text-align:center">${u.year||new Date().getFullYear()}</td>
+    ${_editMode?`<td><button class="btn bo bs" onclick="editUser('${u.id}')">✏️ Editar</button></td>`:''}
+  </tr>`).join('');
+}
+
+// ══════ EXPORT ══════
+function buildExportRows(){
+  return getEvents().map(ev=>{
+    const u=getUsers().find(x=>x.id===ev.userId);
+    return {'Usuario':u?u.name:'—','Departamento':u?u.dept:'—','Tipo':evLabel(ev.type),
+      'Fecha inicio':fmt(ev.start),'Fecha fin':ev.type==='vacaciones'?fmt(ev.end):fmt(ev.start),
+      'Horas':(ev.type==='asunto'||ev.type==='medica')?(ev.hours||1):'—','Notas':ev.notes||''};
+  });
+}
+function exportCSV(){
+  const rows=buildExportRows();if(!rows.length){showToast('Sin datos','err');return;}
+  const cols=Object.keys(rows[0]);const q=v=>'"'+String(v||'').replace(/"/g,'""')+'"';
+  const csv='\uFEFF'+[cols.join(';'),...rows.map(r=>cols.map(c=>q(r[c])).join(';'))].join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='epelsa_calendarios_'+today()+'.csv';document.body.appendChild(a);a.click();document.body.removeChild(a);
+  showToast(rows.length+' registros exportados');
+}
+async function exportXLS(){
+  const rows=buildExportRows();if(!rows.length){showToast('Sin datos','err');return;}
+  const cols=Object.keys(rows[0]);
+  const xe=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const cl=n=>{let s='';while(n>=0){s=String.fromCharCode(65+(n%26))+s;n=Math.floor(n/26)-1;}return s;}
+  const allRows=[cols,...rows.map(r=>cols.map(c=>r[c]))];
+  const sheetData=allRows.map((row,ri)=>'<row r="'+(ri+1)+'">'+ row.map((val,ci)=>'<c r="'+cl(ci)+(ri+1)+'" t="inlineStr"><is><t>'+xe(String(val))+'</t></is></c>').join('')+'</row>').join('');
+  const colsXml=[22,18,16,14,14,10,30].map((w,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+w+'" customWidth="1"/>').join('');
+  const sheetXml='<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetFormatPr defaultRowHeight="15"/><cols>'+colsXml+'</cols><sheetData>'+sheetData+'</sheetData></worksheet>';
+  const wbXml='<?xml version="1.0" encoding="UTF-8"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Calendarios" sheetId="1" r:id="rId1"/></sheets></workbook>';
+  const ct='<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>';
+  const topRels='<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+  const wbRels='<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>';
+  const zip=new JSZip();
+  zip.file('[Content_Types].xml',ct);zip.file('_rels/.rels',topRels);
+  zip.file('xl/workbook.xml',wbXml);zip.file('xl/_rels/workbook.xml.rels',wbRels);zip.file('xl/worksheets/sheet1.xml',sheetXml);
+  const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='epelsa_calendarios_'+today()+'.xlsx';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);showToast('Excel generado');
+}
+function exportPDF(){
+  const events=getEvents().sort((a,b)=>a.start.localeCompare(b.start));
+  if(!events.length){showToast('Sin datos','err');return;}
+  const lines=['GRUPO EPELSA S.L.U. - REGISTRO DE SOLICITUDES','Generado: '+fmt(today()),'',
+    'USUARIO | TIPO | INICIO | FIN | HRS | NOTAS','-'.repeat(80)];
+  events.forEach(ev=>{
+    const u=getUsers().find(x=>x.id===ev.userId);
+    const name=(u?u.name:'—').padEnd(20);
+    const t=evLabel(ev.type).padEnd(16);
+    const s=fmt(ev.start).padEnd(12);
+    const e=(ev.type==='vacaciones'?fmt(ev.end):fmt(ev.start)).padEnd(12);
+    const h=((ev.type!=='vacaciones')?String(ev.hours||1)+'h':'—').padEnd(5);
+    lines.push(`${name} | ${t} | ${s} | ${e} | ${h} | ${ev.notes||''}`);
+  });
+  const w=window.open('','_blank','width=900,height=700');
+  w.document.write(`<html><head><title>Calendarios Epelsa</title><style>body{font-family:monospace;font-size:12px;padding:20px;white-space:pre-wrap;}</style></head><body>${esc(lines.join('\n'))}<script>window.onload=()=>window.print()<\/script></body></html>`);
+  w.document.close();
+}
+function toggleExportMenu(e){e.stopPropagation();document.getElementById('export-menu').classList.toggle('open');}
+function closeExportMenu(){document.getElementById('export-menu').classList.remove('open');}
+function toggleExportMenu2(e){e.stopPropagation();document.getElementById('export-menu2').classList.toggle('open');}
+function closeExportMenu2(){document.getElementById('export-menu2').classList.remove('open');}
+document.addEventListener('click',()=>{closeExportMenu();closeExportMenu2();});
+
+// ══════ AUTH ══════
+let _editMode=false, _pendingAuthCb=null;
+function getPin(){return localStorage.getItem(PIN_KEY)||'1234';}
+function isAuth(){return localStorage.getItem('cal_auth')==='ok';}
+function handleSalir(){if(_editMode)exitEditMode();else{localStorage.removeItem('cal_auth');updateAuthUI();}}
+function enterEditMode(){
+  _editMode=true;localStorage.setItem('cal_edit_mode','1');
+  updateAuthUI();applyEditModeStyle();
+  document.getElementById('edit-mode-banner').style.display='flex';
+  document.getElementById('cal-holiday-btn-wrap').style.display='inline-flex';
+  document.getElementById('add-user-btn').style.display='inline-flex';
+  document.getElementById('user-actions-th').style.display='';
+  if(_currentView==='s')renderSolicitudes();
+  if(_currentView==='l')renderSummary();
+  if(_currentView==='u')renderUsers();
+}
+function exitEditMode(){
+  _editMode=false;localStorage.removeItem('cal_edit_mode');localStorage.removeItem('cal_auth');
+  applyEditModeStyle();updateAuthUI();
+  document.getElementById('edit-mode-banner').style.display='none';
+  document.getElementById('cal-holiday-btn-wrap').style.display='none';
+  document.getElementById('add-user-btn').style.display='none';
+  document.getElementById('user-actions-th').style.display='none';
+  showToast('Modo edición desactivado','info');
+  if(_currentView==='s')renderSolicitudes();
+  if(_currentView==='l')renderSummary();
+  if(_currentView==='u')renderUsers();
+  if(_currentView==='c')renderCalendar();
+}
+function applyEditModeStyle(){
+  const hdr=document.querySelector('header');
+  if(_editMode){hdr.style.background='linear-gradient(135deg,#581c87,#7c3aed)';hdr.style.boxShadow='0 2px 12px rgba(124,58,237,.5)';}
+  else{hdr.style.background='';hdr.style.boxShadow='';}
+}
+function updateAuthUI(){
+  document.getElementById('btn-logout').style.display=(_editMode||isAuth())?'inline-flex':'none';
+  const btnE=document.getElementById('btnE');
+  if(btnE)btnE.classList.toggle('on',_editMode);
+}
+function reqAuth(cb){
+  if(isAuth()){cb();return;}
+  _pendingAuthCb=cb;
+  document.getElementById('pin-input').value='';document.getElementById('pin-err').textContent='';
+  document.getElementById('pin-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('pin-input').focus(),80);
+}
+function submitPin(){
+  const v=document.getElementById('pin-input').value;
+  if(v===getPin()){
+    localStorage.setItem('cal_auth','ok');updateAuthUI();closeOverlay('pin-overlay');
+    if(_pendingAuthCb){const cb=_pendingAuthCb;_pendingAuthCb=null;cb();}
+  } else {
+    document.getElementById('pin-err').textContent='PIN incorrecto';
+    const i=document.getElementById('pin-input');i.classList.remove('shake');void i.offsetWidth;i.classList.add('shake');i.value='';
+  }
+}
+function showChangePin(){
+  closeOverlay('pin-overlay');
+  ['chpin-old','chpin-new','chpin-rep'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('chpin-err').textContent='';
+  document.getElementById('chpin-overlay').classList.add('open');
+}
+function submitChangePIN(){
+  const o=document.getElementById('chpin-old').value,n=document.getElementById('chpin-new').value,r=document.getElementById('chpin-rep').value;
+  const e=document.getElementById('chpin-err');
+  if(o!==getPin()){e.textContent='PIN actual incorrecto';return;}
+  if(n.length<4){e.textContent='Mínimo 4 caracteres';return;}
+  if(n!==r){e.textContent='Los PINs no coinciden';return;}
+  localStorage.setItem(PIN_KEY,n);closeOverlay('chpin-overlay');showToast('PIN actualizado ✓');sbSync();
+}
+function closeOverlay(id){document.getElementById(id).classList.remove('open');}
+['pin-overlay','chpin-overlay','del-overlay','event-overlay','user-overlay','day-overlay','holiday-overlay'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('click',e=>{if(e.target===e.currentTarget)closeOverlay(id);});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    if(document.getElementById('pin-overlay').classList.contains('open'))submitPin();
+    if(document.getElementById('chpin-overlay').classList.contains('open'))submitChangePIN();
+  }
+  if(e.key==='Escape')['event-overlay','user-overlay','day-overlay','del-overlay','pin-overlay','chpin-overlay','holiday-overlay'].forEach(id=>closeOverlay(id));
+});
+
+// ══════ SUPABASE ══════
+var _sbUrl=_SB_STATIC_URL.replace(/\/$/,''), _sbKey=_SB_STATIC_KEY;
+
+async function sbInit(){
+  if(!_sbUrl||!_sbKey){sbSetDot('off');return;}
+  sbSetDot('sync');
+  try{
+    var r=await fetch(_sbUrl+'/rest/v1/epelsa_data?key=in.(epelsa_cal_users,epelsa_cal_events,epelsa_cal_holidays,epelsa_cal_pin)&select=key,value',
+      {headers:{apikey:_sbKey,Authorization:'Bearer '+_sbKey}});
+    if(!r.ok){sbSetDot('err');return;}
+    var data=await r.json();
+    if(data&&data.length) data.forEach(row=>{
+      if(row.key&&row.value!==undefined&&row.value!==null){
+        // PIN is stored as a plain string wrapped in JSON
+        localStorage.setItem(row.key, typeof row.value==='string'?row.value:JSON.stringify(row.value));
+      }
+    });
+    sbSetDot('ok');
+  }catch{sbSetDot('err');}
+}
+
+async function sbSync(){
+  if(!_sbUrl||!_sbKey)return;
+  sbSetDot('sync');
+  let ok=true;
+  const pin=localStorage.getItem(PIN_KEY)||'1234';
+  const keys=[{k:LS_USERS,v:JSON.parse(localStorage.getItem(LS_USERS)||'[]')},{k:LS_EVENTS,v:JSON.parse(localStorage.getItem(LS_EVENTS)||'[]')},{k:LS_HOLIDAYS,v:JSON.parse(localStorage.getItem(LS_HOLIDAYS)||'[]')},{k:PIN_KEY,v:pin}];
+  for(var item of keys){
+    try{
+      var r=await fetch(_sbUrl+'/rest/v1/epelsa_data',{
+        method:'POST',
+        headers:{apikey:_sbKey,Authorization:'Bearer '+_sbKey,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+        body:JSON.stringify({key:item.k,value:item.v})
+      });
+      if(!r.ok) ok=false;
+    }catch{ok=false;}
+  }
+  sbSetDot(ok?'ok':'err');
+}
+
+function sbSetDot(s){var d=document.getElementById('sb-dot');if(d)d.className='sb-dot '+s;}
+
+// ══════ INIT ══════
+// ══════ DARK MODE ══════
+function toggleDarkMode(){
+  const isDark=document.body.classList.toggle('dark');
+  localStorage.setItem('epelsa_dark',isDark?'1':'0');
+  document.getElementById('dm-icon').textContent=isDark?'🌙':'☀️';
+}
+function initDarkMode(){
+  if(localStorage.getItem('epelsa_dark')==='1'){
+    document.body.classList.add('dark');
+    document.getElementById('dm-icon').textContent='🌙';
+  }
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  initDarkMode();
+  if(localStorage.getItem('cal_edit_mode')==='1'){
+    _editMode=true;applyEditModeStyle();
+    document.getElementById('edit-mode-banner').style.display='flex';
+    document.getElementById('cal-holiday-btn-wrap').style.display='inline-flex';
+  }
+  updateAuthUI();
+  await sbInit();
+  document.getElementById('usr-year').value=Math.max(new Date().getFullYear(),2026);
+  sv('s');
+});
+</script>
+</body>
+</html>
