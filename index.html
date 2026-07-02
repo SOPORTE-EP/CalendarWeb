@@ -699,7 +699,7 @@ function sv(v){
 
 // ══════ CALENDAR ══════
 let _calYear=new Date().getFullYear(), _calMonth=new Date().getMonth();
-let _calView='monthly', _dayDetailDate=null;
+let _calView='annual', _dayDetailDate=null;
 
 function changeMonth(d){
   if(_calView==='annual'){_calYear+=d;renderCalendar();return;}
