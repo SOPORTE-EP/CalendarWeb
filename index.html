@@ -225,8 +225,8 @@ body.dark .export-item:hover{background:#1e2d45;color:var(--blue)}
     <button class="nb ng" id="btnE" onclick="reqAuth(enterEditMode)" title="Modo edición (PIN)" style="padding:6px 9px">
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
     </button>
-    <button class="nb ng" id="btnCal" onclick="sv('c')">📅 Calendario</button>
-    <button class="nb ng on" id="btnSol" onclick="sv('s')">📝 Solicitudes</button>
+    <button class="nb ng on" id="btnCal" onclick="sv('c')">📅 Calendario</button>
+    <button class="nb ng" id="btnSol" onclick="sv('s')">📝 Solicitudes</button>
     <button class="nb ng" id="btnList" onclick="sv('l')">📋 Resumen</button>
     <button class="nb ng" id="btnUsers" onclick="sv('u')">👥 Usuarios</button>
     <button class="nb ng" id="btn-logout" style="display:none" onclick="handleSalir()">⎋ Salir</button>
@@ -686,7 +686,7 @@ function showToast(msg,type='ok'){
 }
 
 // ══════ NAV ══════
-let _currentView='s';
+let _currentView='c';
 function sv(v){
   ['c','s','u','l'].forEach(x=>document.getElementById('v'+x).classList.toggle('on',x===v));
   ['btnCal','btnSol','btnList','btnUsers'].forEach(id=>document.getElementById(id)?.classList.remove('on'));
@@ -1613,7 +1613,7 @@ document.addEventListener('DOMContentLoaded',async()=>{
   updateAuthUI();
   await sbInit();
   document.getElementById('usr-year').value=Math.max(new Date().getFullYear(),2026);
-  sv('s');
+  sv('c');
 });
 </script>
 </body>
